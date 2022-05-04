@@ -32,6 +32,7 @@ class CalcController {
 
 
         this.displayDate = this.currentDate.toLocaleDateString(this._locale, {
+            // array
             day: '2-digit',
             month: "long",
             year: "numeric"
