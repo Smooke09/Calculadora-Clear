@@ -1,6 +1,5 @@
 class CalcController {
 
-
     constructor() {
 
         // atributo
@@ -12,36 +11,47 @@ class CalcController {
 
         this._currentDate;
         this.initialize();
-
+        this.initButtonsEVents();
     }
 
     // metodo principal ao iniciar acontecer
     initialize() {
 
-        this.setDisplayDateTime();
+        this.setDisplayDateTime()
 
         setInterval(() => {
 
             this.setDisplayDateTime();
-        }, 1000)
+
+        }, 1000);
+
+    }
+
+    initButtonsEVents() {
+
+        let buttons = document.querySelectorAll("#buttons > g, #parts > g");
+
+        buttons.forEach((btn, index) => {
+
+            btn.addEventListener('click', e => {
+
+                console.log(btn.className.baseVal.replace("btn-", ""));
+            });
+        });
     }
 
     // Metodo
     setDisplayDateTime() {
 
-
-
         this.displayDate = this.currentDate.toLocaleDateString(this._locale, {
-            // array
-            day: '2-digit',
+            day: "2-digit",
             month: "long",
             year: "numeric"
-        })
-
+        });
         this.displayTime = this.currentDate.toLocaleTimeString(this._locale);
+
     }
 
-    // adicionando no DOM
     get displayTime() {
 
         return this._timeEl.innerHTML;
