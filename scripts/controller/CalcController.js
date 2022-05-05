@@ -6,7 +6,9 @@ class CalcController {
         this._lastNumber = '';
 
         this._operation = [];
+        // Atributo
         this._locale = 'pt-BR';
+        // Pegando o valor no HTML
         this._displayCalcEl = document.querySelector("#display");
         this._dateEl = document.querySelector("#data");
         this._timeEl = document.querySelector("#hora");
@@ -16,6 +18,7 @@ class CalcController {
 
     }
 
+    // Metodo de inicialização
     initialize() {
 
         this.setDisplayDateTime()
@@ -30,6 +33,7 @@ class CalcController {
 
     }
 
+    // Metodo
     addEventListenerAll(element, events, fn) {
 
         events.split(' ').forEach(event => {
@@ -40,14 +44,17 @@ class CalcController {
 
     }
 
+    // Metodo para apagar tudo 
     clearAll() {
-
         this._operation = [];
+        this._lastNumber = '';
+        this.lastOperation = '';
 
         this.setLastNumberToDisplay();
 
     }
 
+    // Metodo para limpa letra 
     clearEntry() {
 
         this._operation.pop();
@@ -136,10 +143,12 @@ class CalcController {
 
         }
 
+        // Atualizam Na tela   
         this.setLastNumberToDisplay();
 
     }
 
+    // pegando ultimo item do display
     getLastItem(isOperator = true) {
 
         let lastItem;
@@ -185,16 +194,9 @@ class CalcController {
 
                 this.setLastOperation(value);
 
-            } else if (isNaN(value)) {
-
-                console.log("outra coisa", value);
-
             } else {
-
                 this.pushOperation(value);
-
                 this.setLastNumberToDisplay();
-
             }
 
         } else {
@@ -207,7 +209,7 @@ class CalcController {
 
                 let newValue = this.getLastOperation().toString() + value.toString();
 
-                this.setLastOperation(parseInt(newValue));
+                this.setLastOperation(newValue);
 
                 this.setLastNumberToDisplay();
 
@@ -222,6 +224,24 @@ class CalcController {
         this.displayCalc = "Error";
 
     }
+
+
+    // Metodo adicionando ponto
+    addDot() {
+
+        let lastOperation = this.getLastOperation();
+
+        // Verificando se tem mas de um ponto e se é uma string
+        if (typeof lastOperation === 'string' && lastOperation.split('').indexOf('.') > -1) return;
+        if (this.isOperator(lastOperation) || !lastOperation) {
+            this.pushOperation('0.');
+        } else {
+            this.setLastOperation(lastOperation.toString() + '.');
+        }
+
+        this.setLastNumberToDisplay();
+    }
+
 
     execBtn(value) {
 
@@ -260,7 +280,7 @@ class CalcController {
                 break;
 
             case 'ponto':
-                this.addOperation('.');
+                this.addDot('.');
                 break;
 
             case '0':
@@ -319,6 +339,7 @@ class CalcController {
 
     }
 
+    // Metodos
     get displayTime() {
 
         return this._timeEl.innerHTML;
