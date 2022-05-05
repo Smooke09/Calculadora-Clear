@@ -1,13 +1,17 @@
 class CalcController {
-
     constructor() {
 
         this._lastOperator = '';
         this._lastNumber = '';
 
-        this._operation = [];
+        // audio
+        this._audioOnOFf = false;
+        this._audio = new Audio('click.mp3');
+
         // Atributo
+        this._operation = [];
         this._locale = 'pt-BR';
+
         // Pegando o valor no HTML
         this._displayCalcEl = document.querySelector("#display");
         this._dateEl = document.querySelector("#data");
@@ -17,7 +21,35 @@ class CalcController {
         this.initButtonsEvents();
         this.initKeyboard();
 
+
     }
+
+    // Copiar da area de trasferencia
+    pasteFromClipboard() {
+        document.addEventListener('paste', e => {
+
+            let text = e.clipboardData.getData('Text');
+            this.displayCalc = parseFloat(text);
+
+            // console.log(text)
+        })
+    }
+
+
+    // Metodo para copiar Ctrl C
+    copyToClipboard() {
+
+        let input = document.createElement('input');
+
+        input.value = this.displayCalc;
+
+        document.body.appendChild(input);
+
+        input.select();
+        document.execCommand("Copy")
+        input.remove();
+    }
+
 
     // Metodo de inicialização
     initialize() {
@@ -31,13 +63,37 @@ class CalcController {
         }, 1000);
 
         this.setLastNumberToDisplay();
+        this.pasteFromClipboard();
 
+        document.querySelectorAll('.btn-ac').forEach(btn => {
+
+            btn.addEventListener('dblclick', e => {
+
+                this.toggleAudio();
+
+            });
+        });
+    }
+
+    // Saber se o audio esta ligado ou nao
+    toggleAudio() {
+        // if ternario
+        this._audioOnOFf = !this._audioOnOFf;
+    }
+
+    playAudio() {
+
+        if (this._audioOnOFf) {
+            this._audio.currentTime = 0;
+            this._audio.play();
+        }
     }
 
     // Evento para pega as teclas do teclado
     initKeyboard() {
         document.addEventListener('keyup', e => {
 
+            this.playAudio();
             // console.log(e.key);
 
             switch (e.key) {
@@ -80,6 +136,9 @@ class CalcController {
                 case '9':
                     this.addOperation(parseInt(e.key));
                     break;
+
+                case 'c':
+                    if (e.ctrlKey) this.copyToClipboard();
             }
         });
     }
@@ -109,9 +168,10 @@ class CalcController {
     clearEntry() {
         this._operation.pop();
         this.setLastNumberToDisplay();
-
+        return
     }
 
+    // Pegar ultima operaçao
     getLastOperation() {
 
         return this._operation[this._operation.length - 1];
@@ -141,13 +201,19 @@ class CalcController {
         }
 
     }
-
+    // Checar resultado
     getResult() {
-
-        return eval(this._operation.join(""));
+        try {
+            return eval(this._operation.join(""));
+        } catch (e) {
+            setTimeout(() => {
+                this.setError();
+            }, 1)
+        }
 
     }
 
+    // Calcular
     calc() {
 
         let last = '';
@@ -266,6 +332,7 @@ class CalcController {
 
     }
 
+    // Mensagem de erro
     setError() {
 
         this.displayCalc = "Error";
@@ -291,6 +358,8 @@ class CalcController {
 
     // Executando os botoes ao clicar neles
     execBtn(value) {
+
+        this.playAudio();
 
         switch (value) {
 
@@ -418,6 +487,11 @@ class CalcController {
     }
 
     set displayCalc(value) {
+
+        if (value.toString().length > 10) {
+            this.setError();
+            return;
+        }
 
         this._displayCalcEl.innerHTML = value;
 
